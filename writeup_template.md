@@ -23,12 +23,13 @@ The goals / steps of this project are the following:
 [image2]: ./test_images/test1.jpg "Road Transformed"
 [image3]: ./output_images/result_undistorted_test1.jpg "Binary Example"
 [image4]: ./output_images/result_warped_test1.jpg "Warp Example"
-[image5]: ./output_images/result_threshold_test1.jpg "Warp Example"
-[image6]: ./output_images/result_threshold_test2.jpg "Warp Example"
-[image7]: ./output_images/result_threshold_test3.jpg "Warp Example"
-[image8]: ./examples/color_fit_lines.jpg "Fit Visual"
-[image9]: ./examples/example_output.jpg "Output"
-[video10]: ./project_video.mp4 "Video"
+[image5]: ./output_images/result_threshold_test1.jpg "Color Example"
+[image6]: ./output_images/result_threshold_test2.jpg "Color Example"
+[image7]: ./output_images/result_threshold_test3.jpg "Color Example"
+[image8]: ./examples/result_lanes_test1.jpg "Fit Visual Output"
+[image9]: ./examples/result_lanes_test2.jpg "Fit Visual Output"
+[image10]: ./examples/result_lanes_test3.jpg "Fit Visual Output"
+[video11]: ./project_video.mp4 "Video"
 
 ## [Rubric](https://review.udacity.com/#!/rubrics/571/view) Points
 
@@ -99,26 +100,35 @@ The following is an example from this stage of the pipeline. You can see the ori
 
 I used a combination of color thresholds to generate a binary image. 
 To isolate the yellow lane I used the B channel of the LAB color space. The B channel is also called the blue–yellow channel, and a threshold of (145, 255) seemed to work well for the video and test_images. 
-To isolate the white lane I used the Yc channel of the YCbCr color space, which also called luminance. It managed to isolated the white lane pretty well in the test images and videos, across diferrent lighting conditions.
+To isolate the white lane I used the Yc channel of the YCbCr color space, which also called luminance. It managed to isolated the white lane pretty well in the test images and videos, across diferrent lighting conditions. I used a threshold of  (220, 255)
+
+I also tried to implement a directional and magnitude sobel operator but i found that in my case it mostly added noise to output.
 
 The code can be found in functions apply_all_thresholds, b_threshold, yc_thresold.
-Here are some examples of my output for this step.
+Here are some examples of my output for this step. The output images are binary images.
+
+![alt text][image5]
+![alt text][image6]
+![alt text][image7]
 
 #### 4. Describe how (and identify where in your code) you identified lane-line pixels and fit their positions with a polynomial?
 
-Then I did some other stuff and fit my lane lines with a 2nd order polynomial kinda like this:
+In order to fit lane-lines on top of the warped perspective I first applied a histogram on the previous layer images. Taking the two peaks which corespond to the lane lines are very good starting points for the x base of the lanes. This base is a good place to start lookging for points - we check for points at an offset from the center - the margin. Afterwards i proceeded with a sliding window search all the way to the top of the image, checking which points are members of the line. This is done for both left and right lines. After we obtain these points we can proceed to fit a second order polynomial on both sets of points. 
 
-![alt text][image5]
+I implemented this step in the function find_line.
+Here are some outputs from this stage. On the left is the birds-eye image with the lines-fitted, while on the right is the final output of the pipeline which is the unwarped image with the lanes being correctly identified.
+
+![alt text][image8]
+![alt text][image9]
+![alt text][image10]
+
 
 #### 5. Describe how (and identify where in your code) you calculated the radius of curvature of the lane and the position of the vehicle with respect to center.
 
-I did this in lines # through # in my code in `my_other_file.py`
+The radius of curvature and position of the vehicle are calculated in the find_line function and outputed on the final image.
+For the radius we used the formula learned in the courses, and involves taking the first and second derivatives of the polynomials that we fit on the lines. 
 
-#### 6. Provide an example image of your result plotted back down onto the road such that the lane area is identified clearly.
-
-I implemented this step in lines # through # in my code in `yet_another_file.py` in the function `map_lane()`.  Here is an example of my result on a test image:
-
-![alt text][image6]
+We can assume the camera is mounted at the center of the car, such that the lane center is the midpoint at the bottom of the image between the two lines we've detected. The offset of the lane center from the center of the image (converted from pixels to meters) is the distance from the center of the lane. 
 
 ---
 
@@ -126,7 +136,21 @@ I implemented this step in lines # through # in my code in `yet_another_file.py`
 
 #### 1. Provide a link to your final video output.  Your pipeline should perform reasonably well on the entire project video (wobbly lines are ok but no catastrophic failures that would cause the car to drive off the road!).
 
-Here's a [link to my video result](./project_video.mp4)
+The video pipeline uses a lot of the stages I discussed previously.
+-we undistort the image
+-we warp it
+-we apply color thresholds
+-we try to obtain lane points and fit lines
+    -if no previous lines were found we do a full sliding window search i discussed previously
+    -if we have previous points found than we can just check around a margin of those points for a fast search.
+        - this works like a look ahead filter
+        - if not enough points are found we can do a fast search
+    -i try to smooth the lanes by averagin line fits from the last 5 frames
+    -if both methods don't find lanes in the current frame than i just use the previous best fit
+ -use the points and lines obtained to calculate radius and offset
+ -output image to video
+
+Here's a [link to my video result](./result.mp4)
 
 ---
 
@@ -134,4 +158,4 @@ Here's a [link to my video result](./project_video.mp4)
 
 #### 1. Briefly discuss any problems / issues you faced in your implementation of this project.  Where will your pipeline likely fail?  What could you do to make it more robust?
 
-Here I'll talk about the approach I took, what techniques I used, what worked and why, where the pipeline might fail and how I might improve it if I were going to pursue this project further.  
+The implementation works quite well for the project video. Because the color/gradient thresholds are hardcoded i'm expecting the pipeline to have problems when there are dramatic differences in lighting and lane curvature change. Instead of static threshold i feel there is a need for an adaptive threshold that takes information from previous frames in order to provide better intermediary outputs. This is very important in order to obtain good fitted lines. Also I feel that I need some better sanity checks in order to reject glaring outliers and replace them with previous fits. This should offer a smoother output.

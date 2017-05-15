@@ -26,9 +26,9 @@ The goals / steps of this project are the following:
 [image5]: ./output_images/result_threshold_test1.jpg "Color Example"
 [image6]: ./output_images/result_threshold_test2.jpg "Color Example"
 [image7]: ./output_images/result_threshold_test3.jpg "Color Example"
-[image8]: ./examples/result_lanes_test1.jpg "Fit Visual Output"
-[image9]: ./examples/result_lanes_test2.jpg "Fit Visual Output"
-[image10]: ./examples/result_lanes_test3.jpg "Fit Visual Output"
+[image8]: ./output_images/result_lanes_test1.jpg "Fit Visual Output"
+[image9]: ./output_images/result_lanes_test2.jpg "Fit Visual Output"
+[image10]: ./output_images/result_lanes_test3.jpg "Fit Visual Output"
 [video11]: ./project_video.mp4 "Video"
 
 ## [Rubric](https://review.udacity.com/#!/rubrics/571/view) Points

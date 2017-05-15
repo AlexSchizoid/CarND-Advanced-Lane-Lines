@@ -133,18 +133,18 @@ We can assume the camera is mounted at the center of the car, such that the lane
 #### 1. Provide a link to your final video output.  Your pipeline should perform reasonably well on the entire project video (wobbly lines are ok but no catastrophic failures that would cause the car to drive off the road!).
 
 The video pipeline uses a lot of the stages I discussed previously.
--we undistort the image
--we warp it
--we apply color thresholds
--we try to obtain lane points and fit lines
-    -if no previous lines were found we do a full sliding window search i discussed previously
-    -if we have previous points found than we can just check around a margin of those points for a fast search.
-        - this works like a look ahead filter
-        - if not enough points are found we can do a fast search
-    -i try to smooth the lanes by averagin line fits from the last 5 frames
-    -if both methods don't find lanes in the current frame than i just use the previous best fit
- -use the points and lines obtained to calculate radius and offset
- -output image to video
+* we undistort the image
+* we warp it
+* we apply color thresholds
+* we try to obtain lane points and fit lines
+* if no previous lines were found we do a full sliding window search i discussed previously
+* if we have previous points found than we can just check around a margin of those points for a fast search.
+* this works like a look ahead filter
+* if not enough points are found we can do a fast search
+* i try to smooth the lanes by averagin line fits from the last 5 frames
+* if both methods don't find lanes in the current frame than i just use the previous best fit
+* use the points and lines obtained to calculate radius and offset
+* output image to video
 
 Here's a [link to my video result](./result.mp4)
 
